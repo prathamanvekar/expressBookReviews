@@ -1,4 +1,5 @@
 const express = require("express");
+const axios = require("axios");
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
@@ -67,6 +68,45 @@ public_users.get("/title/:title", function (req, res) {
 public_users.get("/review/:isbn", function (req, res) {
   const isbn = req.params.isbn;
   return res.send(JSON.stringify(books[isbn].reviews, null, 4));
+});
+
+public_users.get("/async/books", async function (req, res) {
+  try {
+    const response = await axios.get("http://localhost:5000/");
+    return res.send(response.data);
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to fetch books" });
+  }
+});
+
+public_users.get("/async/isbn/:isbn", async function (req, res) {
+  try {
+    const isbn = req.params.isbn;
+    const response = await axios.get(`http://localhost:5000/isbn/${isbn}`);
+    return res.send(response.data);
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to fetch book by ISBN" });
+  }
+});
+
+public_users.get("/async/author/:author", async function (req, res) {
+  try {
+    const author = req.params.author;
+    const response = await axios.get(`http://localhost:5000/author/${author}`);
+    return res.send(response.data);
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to fetch books by author" });
+  }
+});
+
+public_users.get("/async/title/:title", async function (req, res) {
+  try {
+    const title = req.params.title;
+    const response = await axios.get(`http://localhost:5000/title/${title}`);
+    return res.send(response.data);
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to fetch books by title" });
+  }
 });
 
 module.exports.general = public_users;
