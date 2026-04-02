@@ -1,20 +1,24 @@
-const express = require('express');
-const jwt = require('jsonwebtoken');
+const express = require("express");
+const jwt = require("jsonwebtoken");
 let books = require("./booksdb.js");
 const regd_users = express.Router();
 
 let users = [];
 
-const isValid = (username)=>{ //returns boolean
+const isValid = (username) => {
+  //returns boolean
   return !users.some((user) => user.username === username);
-}
+};
 
-const authenticatedUser = (username,password)=>{ //returns boolean
-  return users.some((user) => user.username === username && user.password === password);
-}
+const authenticatedUser = (username, password) => {
+  //returns boolean
+  return users.some(
+    (user) => user.username === username && user.password === password,
+  );
+};
 
 //only registered users can login
-regd_users.post("/login", (req,res) => {
+regd_users.post("/login", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
@@ -23,7 +27,9 @@ regd_users.post("/login", (req,res) => {
   }
 
   if (authenticatedUser(username, password)) {
-    const accessToken = jwt.sign({ username: username }, "access", { expiresIn: 60 * 60 });
+    const accessToken = jwt.sign({ username: username }, "access", {
+      expiresIn: 60 * 60,
+    });
     req.session.authorization = {
       accessToken,
     };
@@ -31,7 +37,9 @@ regd_users.post("/login", (req,res) => {
     return res.status(200).send("User successfully logged in");
   }
 
-  return res.status(208).json({ message: "Invalid Login. Check username and password" });
+  return res
+    .status(208)
+    .json({ message: "Invalid Login. Check username and password" });
 });
 
 // Add a book review
@@ -41,7 +49,9 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   const review = req.query.review;
 
   books[isbn].reviews[username] = review;
-  return res.status(200).json({ message: "Review added/modified successfully" });
+  return res
+    .status(200)
+    .json({ message: "Review added/modified successfully" });
 });
 
 regd_users.delete("/auth/review/:isbn", (req, res) => {
@@ -53,7 +63,9 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
     return res.status(200).json({ message: "Review deleted successfully" });
   }
 
-  return res.status(404).json({ message: "Review does not exist for this user" });
+  return res
+    .status(404)
+    .json({ message: "Review does not exist for this user" });
 });
 
 module.exports.authenticated = regd_users;
